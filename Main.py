@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 from Setup import *
-
+from Log import *
 #If you are using this code create a file named edit config.txt  and insert your bot token
 
 intents=intents=discord.Intents.all()
@@ -41,15 +41,17 @@ async def Setup(ctx):
 @has_permissions(administrator=True)
 async def WelcomeChannel(ctx, args="NONE"):
     if args == "NONE":
-        await ctx.send(f"Please refrence a channel using  #id<@{ctx.message.author.id}>")
-        return
-
-    try:
-        channel = bot.get_channel(int(args))
-        AddServerWelcome(ctx.guild, args)
+        channel = ctx.channel
+        print(channel)
+        AddServerWelcome(ctx.guild.id, channel.id)
         await channel.send(f"Success <@{ctx.message.author.id}>")
-    except:
-        await ctx.send(f"The channel id that you have given is not a channgel please try again.! <@{ctx.message.author.id}>")
+    else:
+        try:
+            channel = bot.get_channel(int(args))
+            AddServerWelcome(ctx.guild.id, args)
+            await channel.send(f"Success <@{ctx.message.author.id}>")
+        except:
+            await ctx.send(f"The channel id that you have given is not a channgel please try again.! <@{ctx.message.author.id}>")
 
 
 #setup main role that people get when they join the server.
@@ -75,16 +77,37 @@ async def mrole(ctx, args="NONE"):
 #ban users
 @bot.command(name="ban")
 @has_permissions(ban_members=True)
-async def ban(ctx, member : discord.Member, reason= None):
-    await member.ban(reason = reason)
-    await ctx.author.send(f"You have banned <@{member.id}> for {reason}")
+async def ban(ctx, member : discord.Member, Reason= None):
+    await member.ban(reason = Reason)
+    if Reason == None:
+        await ctx.author.send(f"You have banned <@{member.id}>!")
+    else:
+        await ctx.author.send(f"You have banned <@{member.id}> for {Reason}!")
+    LoggingChannel = Logging(ctx.guild.id)
+    print(LoggingChannel)
+    if LoggingChannel == "":
+        print("UMM")
+        return
+    else:
+        channel = bot.get_channel(int(LoggingChannel))
+        await channel.send(f"{ctx.author} has banned <@{member.id}> for {Reason}!")
+
+#kick users
+@bot.command(name="kick")
+@has_permissions(kick_members = True)
+async def kick(ctx, member: discord.Member, Reason = None):
+    await member.kick(reason= Reason)
+    if Reason == None: 
+         await ctx.author.send(f"You Kicked <@{member.id}>!")
+    else: 
+        await ctx.author.send(f"You Kicked <@{member.id}> for {Reason}!")
     LoggingChannel = Logging(ctx.guild.id)
     if LoggingChannel == "":
         print("UMM")
         return
     else:
         channel = bot.get_channel(int(LoggingChannel))
-        await channel.send(f"{ctx.author} has banned <@{member.id}> for {reason}")
+        await channel.send(f"{ctx.author} has kicked <@{member.id}> for {Reason}!")
 
 #add logging channel
 @bot.command(name="LoggingChannel")
@@ -119,23 +142,25 @@ async def on_member_join(member):
     info = CheckMember(member.guild.id, member)
     print(info)
     if not info:
-        print("adding")
         Result = AddMember(member.guild.id, member.id)
-        print(f"Result{Result}")
 
     role = ServerGiveRank(member.guild.id)
     print(role)
     if not role == "NONE":
         roles = discord.utils.get(member.guild.roles, id=int(role))
-        print(roles)
         await member.add_roles(roles)
     location = ServerGetwelcome(member.guild.id)
     print(f"location{location}")
     if not location == "0":
         channel = bot.get_channel(int(location))
-        await channel.send(f"Welcome to the server <@{member.id}>")
+        await channel.send(f"Welcome to the server <@{member.id}>!!")
 
-
+def LogChecker(guild):
+    location = Logging(guild.id)
+    if not location == "":
+        return location
+    else:
+        return "null"
 
 
 @bot.event

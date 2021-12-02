@@ -63,8 +63,7 @@ def AddServerWelcome(guild, channel):
     try:
         with open(f"{guild}.json", "r")as file:
             data = json.load(file)
-            data['Settings']["Welcome"] = channel
-            print(data)
+            data['Settings']["Welcome"] = str(channel)
         with open(f"{guild}.json", "w")as file:
             json.dump(data, file)
 
