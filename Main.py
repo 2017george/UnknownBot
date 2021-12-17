@@ -1,4 +1,5 @@
 import discord
+from discord import client
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 from Setup import *
@@ -19,110 +20,6 @@ except:
 
 
 bot = commands.Bot(command_prefix="-", intents=intents)
-
-'''
-Commands
- -Setup forces bot to reset the server infromation.
- -WelcomeChannel Makes a channel into a welcome channel
- '''
-
-@bot.command(name="Setup")
-#Resets the server data
-async def Setup(ctx):
-    print(ctx.message.author.id)
-    if ctx.message.author.id == 318859316176355328:
-        await on_guild_join(ctx.guild)
-        await ctx.send(f"Completed setup")
-    else:
-        await ctx.send(f"Please message anunknown to use -setup")
-
-
-@bot.command(name="WelcomeChannel")
-@has_permissions(administrator=True)
-async def WelcomeChannel(ctx, args="NONE"):
-    if args == "NONE":
-        channel = ctx.channel
-        print(channel)
-        AddServerWelcome(ctx.guild.id, channel.id)
-        await channel.send(f"Success <@{ctx.message.author.id}>")
-    else:
-        try:
-            channel = bot.get_channel(int(args))
-            AddServerWelcome(ctx.guild.id, args)
-            await channel.send(f"Success <@{ctx.message.author.id}>")
-        except:
-            await ctx.send(f"The channel id that you have given is not a channgel please try again.! <@{ctx.message.author.id}>")
-
-
-#setup main role that people get when they join the server.
-@bot.command(name="mrole")
-@has_permissions(manage_roles=True)
-async def mrole(ctx, args="NONE"):
-    if args == "NONE":
-        await ctx.send(f"Please refrence a role by tagging the role <@{ctx.message.author.id}>")
-        return
-
-    Roles = await ctx.guild.fetch_roles()
-    print(Roles, args)
-    Roleid = args.replace("<@&", "").replace(">", "")
-    print(Roleid)
-    for i in Roles:
-        if int(Roleid) == i.id:
-            if AddServerRole(ctx.guild.id, Roleid):
-                await ctx.send(f"<@&{Roleid}> has been set as the main role, and will be given to anyone who joins the server!")
-            else:
-                await ctx.send(f"Error please try again in 5 minutes!")
-            break
-
-#ban users
-@bot.command(name="ban")
-@has_permissions(ban_members=True)
-async def ban(ctx, member : discord.Member, Reason= None):
-    await member.ban(reason = Reason)
-    if Reason == None:
-        await ctx.author.send(f"You have banned <@{member.id}>!")
-    else:
-        await ctx.author.send(f"You have banned <@{member.id}> for {Reason}!")
-    LoggingChannel = Logging(ctx.guild.id)
-    print(LoggingChannel)
-    if LoggingChannel == "":
-        print("UMM")
-        return
-    else:
-        channel = bot.get_channel(int(LoggingChannel))
-        await channel.send(f"{ctx.author} has banned <@{member.id}> for {Reason}!")
-
-#kick users
-@bot.command(name="kick")
-@has_permissions(kick_members = True)
-async def kick(ctx, member: discord.Member, Reason = None):
-    await member.kick(reason= Reason)
-    if Reason == None: 
-         await ctx.author.send(f"You Kicked <@{member.id}>!")
-    else: 
-        await ctx.author.send(f"You Kicked <@{member.id}> for {Reason}!")
-    LoggingChannel = Logging(ctx.guild.id)
-    if LoggingChannel == "":
-        print("UMM")
-        return
-    else:
-        channel = bot.get_channel(int(LoggingChannel))
-        await channel.send(f"{ctx.author} has kicked <@{member.id}> for {Reason}!")
-
-#add logging channel
-@bot.command(name="LoggingChannel")
-@has_permissions(administrator=True)
-async def LoggingChannel(ctx, args="NONE"):
-    if args == "NONE":
-        await ctx.send(f"Please refrence a channel using #id<@{ctx.message.author.id}>")
-        return
-
-    try:
-        channel = bot.get_channel(int(args))
-        AddLoggingChannel(ctx.guild.id, args)
-        await channel.send(f"Success <@{ctx.message.author.id}>")
-    except:
-        await ctx.send(f"The channel id that you have given is not a channel please try again.! <@{ctx.message.author.id}>")
 
 
 #when bot joins server create data
@@ -162,11 +59,13 @@ def LogChecker(guild):
     else:
         return "null"
 
-
 @bot.event
 async def on_ready():
+    bot.load_extension('Messages')
+    bot.load_extension('Moderation')
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
     print('------')
+
 bot.run(Token)
