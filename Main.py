@@ -61,6 +61,7 @@ def LogChecker(guild):
 
 @bot.event
 async def on_ready():
+    bot.load_extension('Points')
     bot.load_extension('Messages')
     bot.load_extension('Moderation')
     print('Logged in as')
