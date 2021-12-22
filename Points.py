@@ -22,13 +22,16 @@ class Points(commands.Cog):
     @commands.command(name="GivePoints")
     @has_permissions(administrator = True)
     async def GivePoints(self, ctx, member: discord.Member, points):
+        await ctx.message.delete()
         try: 
             points = int(points)
             AddPoints(ctx.guild.id, member.id, points)
+            await ctx.send(f"Success <@{ctx.author.id}>, {member.name} has gained {points}")
         except: 
            await ctx.author.send("Please only put a the number of points you would like to give the member!\n Use this format -GivePoints @ member points")
     @commands.command(name="LevelList")
     async def LevelList(self, ctx): 
+        await ctx.message.delete()
         EPoints = Top5(ctx.guild.id)
         em = discord.Embed(title = "Top 5 people with most points!")
         Users = ""
@@ -38,7 +41,7 @@ class Points(commands.Cog):
             try:
                 Users += get(self.bot.get_all_members(), id=int(EPoints[i][1])).name + "\n"
                 Point += str(EPoints[i][0]) + "\n"
-                Place += str(i) + "\n"
+                Place += str(i+1) + "\n"
             except: 
                 pass
         em.add_field(name = "#", value=Place, inline=True)
@@ -49,6 +52,7 @@ class Points(commands.Cog):
         pass
     @commands.command(name="Level")
     async def Level(self, ctx): 
+        await ctx.message.delete()
         points = GetPoints(ctx.guild.id, ctx.author.id)
         if points == None: 
             await ctx.author.send(f"An Error has occured with your account please type something in chat and try ruinning the command again!")
@@ -92,7 +96,7 @@ def Top5(guild):
                 Epoints.append([points, i])
             except: 
                 pass
-        Epoints.sort()
+        Epoints.sort(reverse = True)
         return Epoints
 
 
