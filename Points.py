@@ -82,7 +82,10 @@ def AddPoints(guild, authorId, points):
         except: 
             if(points < 0): 
                 points = 0
-            data["Users"][str(authorId)]["Points"] = points
+            try:
+                data["Users"][str(authorId)]["Points"] = points
+            except:
+                data["Users"][str(authorId)] = {"Points": points}
     with open(f"{guild}.json", "w") as file: 
         json.dump(data, file)
 
