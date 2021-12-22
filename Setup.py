@@ -20,7 +20,7 @@ def CheckMember(guild, user):
     try:
         with open(f"{guild}.json", "r")as file:
             data = json.load(file)
-            if not data['Users']['user'] == null:
+            if not data['Users']['user'] == None:
                 return True
             else:
                 return False
