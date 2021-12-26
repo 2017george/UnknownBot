@@ -1,4 +1,5 @@
 import discord
+from discord.ui import View
 from discord import client
 from discord.ext import commands
 from discord.ext.commands import has_permissions
@@ -61,6 +62,7 @@ def LogChecker(guild):
 
 @bot.event
 async def on_ready():
+    bot.load_extension('CharCards')
     bot.load_extension('Points')
     bot.load_extension('Messages')
     bot.load_extension('Moderation')

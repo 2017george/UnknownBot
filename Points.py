@@ -47,7 +47,7 @@ class Points(commands.Cog):
         em.add_field(name = "#", value=Place, inline=True)
         em.add_field(name = "Names", value=Users, inline=True) 
         em.add_field(name = "Points", value=Point, inline=True)
-        em.set_footer(text= f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar_url)
+        em.set_footer(text= f"Requested by {ctx.author.name}", icon_url=ctx.author.display_avatar.url)
         await ctx.send(embed = em)
         pass
     @commands.command(name="Level")
@@ -58,7 +58,7 @@ class Points(commands.Cog):
             await ctx.author.send(f"An Error has occured with your account please type something in chat and try ruinning the command again!")
         else: 
             em = discord.Embed(description= f"You have **{points} UBucks!** ")
-            em.set_author(name=f"{ctx.author.name}'s Points", icon_url=ctx.author.avatar_url)
+            em.set_author(name=f"{ctx.author.name}'s Points", icon_url=ctx.author.display_avatar.url)
             em.set_footer(text= "You can gain more UBucks by talking in chat!")
             await ctx.send(embed= em)
 
